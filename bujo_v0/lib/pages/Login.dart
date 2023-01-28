@@ -1,5 +1,6 @@
-import 'package:bujo_v0/pages/Map.dart';
-import 'package:bujo_v0/pages/Register.dart';
+// ignore_for_file: file_names
+import 'package:bujo_v0/pages/map.dart';
+import 'package:bujo_v0/pages/register.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
@@ -30,7 +31,7 @@ class Login extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ))),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
             child: TextFormField(
               decoration: (const InputDecoration(
                 labelText: ("Username or Email"),
@@ -49,26 +50,25 @@ class Login extends StatelessWidget {
           Container(
               padding:
                   const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-              child: Row(
+              child: 
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
+                    //alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: ElevatedButton(
                       style: const ButtonStyle(
                           minimumSize: MaterialStatePropertyAll(Size(160, 40))),
                       child: const Text('Login'),
                       onPressed: () {
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: ((context) => MainPage())));
                         Navigator.pushReplacement(context, MaterialPageRoute(
-                                 builder: ((context) => Map())));
+                                 builder: ((context) => const Map())));
                       },
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: OutlinedButton(
                         style: const ButtonStyle(
                             minimumSize:
@@ -77,7 +77,7 @@ class Login extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: ((context) => Register())));
+                                builder: ((context) => const Register())));
                       },
                         child: const Text('Register')),
                   )

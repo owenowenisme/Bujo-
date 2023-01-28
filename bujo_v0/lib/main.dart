@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bujo_v0/pages/Login.dart';
+import 'package:bujo_v0/pages/login.dart';
 
 void main() {
   runApp(const Bujoapp());
