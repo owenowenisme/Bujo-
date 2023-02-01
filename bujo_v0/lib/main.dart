@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bujo_v0/pages/login.dart';
+import 'package:bujo_v0/pages/map.dart';
+
 
 void main() {
   runApp(const Bujoapp());
@@ -15,7 +16,7 @@ class Bujoapp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
          primarySwatch: Colors.blueGrey,
       ),
-      home: const Login(),
+      home: const Map(),
     );
   }
 }

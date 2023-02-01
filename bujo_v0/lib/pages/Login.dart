@@ -19,7 +19,7 @@ class Login extends StatelessWidget {
             width: 200,
             child: Center(
                 child: Image.asset(
-              'images/handwriting.jpeg',
+              'assets/images/handwriting.jpeg',
               height: 100,
             )),
           ),

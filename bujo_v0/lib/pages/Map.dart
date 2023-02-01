@@ -16,14 +16,17 @@ LocationSettings locationSettings = const LocationSettings(
 );
 
 class _MapState extends State<Map> {
-  static late LatLng currentpos;
+  static LatLng currentpos = const LatLng(0, 0);
   static double zoomrate = 14.5;
   static double bearingrate = 0;
   static double tiltrate = 0;
+
+  String mapStyle = '';
+  static bool darkModeIsOn = false;
+  static bool dark = false;
   static late LatLng screentarget;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  static const LatLng from = LatLng(24.083465, 120.546334);
   @override
   void initState() {
     super.initState();
@@ -39,7 +42,6 @@ class _MapState extends State<Map> {
       });
     });
   }
-
 
   void setRate() async {
     zoomrate = 14.5;
@@ -64,6 +66,21 @@ class _MapState extends State<Map> {
     )));
   }
 
+  void changeMapStyle() async {
+    await _controller.future.then((value) {
+      if (darkModeIsOn == false) {
+        DefaultAssetBundle.of(context)
+            .loadString('assets/darkmaptheme.json')
+            .then((string) {
+          value.setMapStyle(string);
+        });
+      } else {
+        value.setMapStyle('');
+      }
+      darkModeIsOn = !darkModeIsOn;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,44 +89,50 @@ class _MapState extends State<Map> {
             myLocationEnabled: true,
             compassEnabled: true,
             onCameraMove: (position) {
-              screentarget= position.target;
+              screentarget = position.target;
               zoomrate = position.zoom.toDouble();
               bearingrate = position.bearing.toDouble();
               tiltrate = position.tilt.toDouble();
             },
             onMapCreated: (GoogleMapController controller) {
+              controller.setMapStyle(mapStyle);
               _controller.complete(controller);
             },
             initialCameraPosition: CameraPosition(
-                target: from,
+                target: currentpos,
                 zoom: zoomrate,
                 bearing: bearingrate,
                 tilt: tiltrate)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            FloatingActionButton(
-              heroTag: "left",
-              onPressed: () {},
-              child: const Icon(Icons.menu),
-            ),
-            Transform.scale(
-              scale: 1.5,
-              child: FloatingActionButton(
-                heroTag: "mainbtn",
-                onPressed: () {
-                  setRate();
-                },
-                child: const Icon(Icons.person_pin_circle_sharp),
-              ),
-            ),
-            FloatingActionButton(
-              heroTag: "right",
-              onPressed: () {},
-              child: const Icon(Icons.menu),
-            ),
-          ],
-        ));
+        floatingActionButton: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Switch.adaptive(
+                  value: darkModeIsOn,
+                  onChanged: (value) {
+                    setState(() {
+                      changeMapStyle();
+                    });
+                  },
+                ),
+                Transform.scale(
+                  scale: 1.5,
+                  child: FloatingActionButton(
+                    heroTag: "mainbtn",
+                    onPressed: () {
+                      setRate();
+                    },
+                    child: const Icon(Icons.person_pin_circle_sharp),
+                  ),
+                ),
+                FloatingActionButton(
+                  heroTag: "right",
+                  onPressed: () {},
+                  child: const Icon(Icons.menu),
+                ),
+              ],
+            )));
   }
 }
