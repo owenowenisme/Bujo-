@@ -55,7 +55,6 @@ class Login extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    //alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: ElevatedButton(
                       style: const ButtonStyle(

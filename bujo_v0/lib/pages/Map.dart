@@ -12,7 +12,7 @@ class Map extends StatefulWidget {
 
 LocationSettings locationSettings = const LocationSettings(
   accuracy: LocationAccuracy.best,
-  distanceFilter: 0,
+  distanceFilter: 2,
 );
 
 class _MapState extends State<Map> {
@@ -20,11 +20,11 @@ class _MapState extends State<Map> {
   static double zoomrate = 14.5;
   static double bearingrate = 0;
   static double tiltrate = 0;
-
+  static bool focusOn = true;
+  late CameraPosition campos;
   String mapStyle = '';
+  Icon fab = const Icon(Icons.my_location);
   static bool darkModeIsOn = false;
-  static bool dark = false;
-  static late LatLng screentarget;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   @override
@@ -37,25 +37,14 @@ class _MapState extends State<Map> {
     Geolocator.getPositionStream(locationSettings: locationSettings)
         .listen((Position? position) {
       setState(() {
+        if (focusOn) {
+          bearingrate = position?.heading.toDouble() ?? 0;
+          setCamera();
+        }
         currentpos = LatLng(position!.latitude, position.longitude);
-        setCamera();
       });
     });
   }
-
-  void setRate() async {
-    zoomrate = 14.5;
-    bearingrate = 0;
-    tiltrate = 0;
-    GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: screentarget,
-      zoom: zoomrate,
-      bearing: bearingrate,
-      tilt: tiltrate,
-    )));
-  }
-
   void setCamera() async {
     GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
@@ -89,12 +78,12 @@ class _MapState extends State<Map> {
             myLocationEnabled: true,
             compassEnabled: true,
             onCameraMove: (position) {
-              screentarget = position.target;
               zoomrate = position.zoom.toDouble();
               bearingrate = position.bearing.toDouble();
               tiltrate = position.tilt.toDouble();
             },
             onMapCreated: (GoogleMapController controller) {
+              getLocation();
               controller.setMapStyle(mapStyle);
               _controller.complete(controller);
             },
@@ -121,10 +110,18 @@ class _MapState extends State<Map> {
                   scale: 1.5,
                   child: FloatingActionButton(
                     heroTag: "mainbtn",
+                    child: fab,
                     onPressed: () {
-                      setRate();
+                      focusOn = !focusOn;
+                      setState(() {
+                        if (!focusOn) {
+                          fab = const Icon(Icons.public);
+                        } else {
+                          setCamera();
+                          fab = const Icon(Icons.my_location);
+                        }
+                      });
                     },
-                    child: const Icon(Icons.person_pin_circle_sharp),
                   ),
                 ),
                 FloatingActionButton(

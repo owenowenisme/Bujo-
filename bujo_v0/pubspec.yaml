@@ -39,6 +39,7 @@ dependencies:
   location: ^4.2.0
   google_maps_flutter: ^2.2.3 
   geolocator: ^9.0.2 
+  flutter_native_splash: ^2.2.16
   
   
 
@@ -52,12 +53,17 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  flutter_launcher_icons: ^0.11.0 
+  flutter_launcher_icons: ^0.11.0
+  
+  
 flutter_icons:
   image_path: "assets/images/favicon.png"
   android: true
   ios: true
-    
+
+# flutter_native_splash: 
+#   color: '#000000'
+#   image: 'assets/images/favicon.png'
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
