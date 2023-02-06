@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 
 class Map extends StatefulWidget {
   const Map({super.key});
+
   @override
   State<Map> createState() => _MapState();
 }
@@ -21,16 +22,27 @@ class _MapState extends State<Map> {
   static double bearingrate = 0;
   static double tiltrate = 0;
   static bool focusOn = true;
-  late CameraPosition campos;
   String mapStyle = '';
+  LocationPermission locationPermission = LocationPermission.denied;
   Icon fab = const Icon(Icons.my_location);
   static bool darkModeIsOn = false;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   @override
   void initState() {
+    DefaultAssetBundle.of(context)
+        .loadString('assets/lightmaptheme.json')
+        .then((string) {
+      mapStyle = string;
+    });
     super.initState();
-    getLocation();
+  }
+
+  Future<void> getPermission() async {
+    locationPermission = await Geolocator.checkPermission();
+    if (locationPermission == LocationPermission.denied) {
+      locationPermission = await Geolocator.requestPermission();
+    }
   }
 
   void getLocation() {
@@ -38,13 +50,17 @@ class _MapState extends State<Map> {
         .listen((Position? position) {
       setState(() {
         if (focusOn) {
-          bearingrate = position?.heading.toDouble() ?? 0;
+          double tmp = position?.heading.toDouble() ?? 0;
+          if ((tmp - bearingrate).abs() > 5) {
+            bearingrate = tmp;
+          }
           setCamera();
         }
         currentpos = LatLng(position!.latitude, position.longitude);
       });
     });
   }
+
   void setCamera() async {
     GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
@@ -64,7 +80,11 @@ class _MapState extends State<Map> {
           value.setMapStyle(string);
         });
       } else {
-        value.setMapStyle('');
+        DefaultAssetBundle.of(context)
+            .loadString('assets/lightmaptheme.json')
+            .then((string) {
+          value.setMapStyle(string);
+        });
       }
       darkModeIsOn = !darkModeIsOn;
     });
@@ -74,15 +94,20 @@ class _MapState extends State<Map> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: GoogleMap(
+            mapType: MapType.normal,
             myLocationButtonEnabled: false,
             myLocationEnabled: true,
             compassEnabled: true,
+            zoomControlsEnabled: false,
             onCameraMove: (position) {
               zoomrate = position.zoom.toDouble();
               bearingrate = position.bearing.toDouble();
               tiltrate = position.tilt.toDouble();
             },
-            onMapCreated: (GoogleMapController controller) {
+            onMapCreated: (GoogleMapController controller) async {
+              if(locationPermission==LocationPermission.denied){
+              await getPermission();
+              }
               getLocation();
               controller.setMapStyle(mapStyle);
               _controller.complete(controller);
