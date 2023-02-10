@@ -20,3 +20,8 @@ doc/api/
 *.js.deps
 *.js.map
 
+bujo_v0/ios/Runner/GoogleService-Info.plist
+bujo_v0/ios/Runner/GoogleService-Info.plist
+bujo_v0/lib/firebase_options.dart
+bujo_v0/ios/Runner/AppDelegate.swift
+bujo_v0/android/app/src/main/AndroidManifest.xml
