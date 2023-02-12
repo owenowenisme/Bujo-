@@ -41,6 +41,7 @@ dependencies:
   geolocator: ^9.0.2 
   flutter_native_splash: ^2.2.16
   firebase_core: ^2.5.0
+  cloud_firestore: ^4.3.2
   
   
 
