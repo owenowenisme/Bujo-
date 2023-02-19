@@ -1,19 +1,56 @@
 // ignore_for_file: file_names
 import 'package:bujo_v0/pages/map.dart';
 import 'package:bujo_v0/pages/register.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:bujo_v0/currentUser.dart';
+import 'package:provider/provider.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   const Login({super.key});
+  @override
+  State<Login> createState() => _LoginState();
+  
+
+}
+
+
+
+
+class _LoginState extends State<Login> {
+  final TextEditingController _emailContriller = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  Stream firestore = FirebaseFirestore.instance.collection('users').snapshots();
+  void _loginUser(String email, String password, BuildContext context) async {
+    CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
+
+    try {
+      if (await _currentUser.loginUser(email, password)) {
+        
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: ((context) => myMap())));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Email or password might be wrong.'),
+              duration: Duration(seconds: 2)),
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        elevation: 0.0,
       ),
       body: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           SizedBox(
             width: 200,
@@ -31,10 +68,12 @@ class Login extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ))),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
             child: TextFormField(
+              controller: _emailContriller,
               decoration: (const InputDecoration(
-                labelText: ("Username or Email"),
+                labelText: ("Email"),
               )),
             ),
           ),
@@ -42,6 +81,7 @@ class Login extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
             child: TextFormField(
+              controller: _passwordController,
               decoration: (const InputDecoration(
                 labelText: ("Pasword"),
               )),
@@ -50,8 +90,7 @@ class Login extends StatelessWidget {
           Container(
               padding:
                   const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-              child: 
-              Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
@@ -61,8 +100,8 @@ class Login extends StatelessWidget {
                           minimumSize: MaterialStatePropertyAll(Size(160, 40))),
                       child: const Text('Login'),
                       onPressed: () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(
-                                 builder: ((context) => const Map())));
+                        _loginUser(_emailContriller.text,
+                            _passwordController.text, context);
                       },
                     ),
                   ),
@@ -73,12 +112,12 @@ class Login extends StatelessWidget {
                             minimumSize:
                                 MaterialStatePropertyAll(Size(160, 40))),
                         onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => const Register())));
-                      },
-                        child: const Text('Register')),
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: ((context) => const Register())));
+                        },
+                        child: const Text('Sign Up!')),
                   )
                 ],
               )),
