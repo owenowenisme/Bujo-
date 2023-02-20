@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 import 'dart:async';
 import 'package:bujo_v0/currentUser.dart';
+import 'package:bujo_v0/pages/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +17,11 @@ class myMap extends StatefulWidget {
 
 LocationSettings locationSettings = const LocationSettings(
   accuracy: LocationAccuracy.best,
-  distanceFilter: 2,
+  distanceFilter: 10,
 );
 //final Set<Marker>
-Set<Marker> markers = {};
 
+Set<Marker> markers = {};
 LatLng currentpos = const LatLng(0, 0);
 Stream firestore = FirebaseFirestore.instance.collection('users').snapshots();
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -44,15 +45,20 @@ class Locationstate {
     querySnapshot.docs.every((element) {
       dynamic val = element.get('location');
       converter = LatLng(val.latitude, val.longitude);
-      markers.add(Marker(markerId: MarkerId(element.id), position: converter));
+      String elementUsername = element.get('username');
+      if (elementUsername != _username) {
+        markers.add(Marker(
+            markerId: MarkerId(element.id),
+            position: converter,
+            infoWindow: InfoWindow(title: elementUsername)));
+      }
       return true;
     });
-    markers.add(Marker(markerId: MarkerId(_uid), position: currentpos));
   }
 }
 
 class _myMapState extends State<myMap> {
-  static double zoomrate = 7.5;
+  static double zoomrate = 14.5;
   static double bearingrate = 0;
   static double tiltrate = 0;
   static bool focusOn = true;
@@ -128,6 +134,12 @@ class _myMapState extends State<myMap> {
     });
   }
 
+  void logoutUser() {
+    _auth.signOut();
+    Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: ((context) =>const Login())));
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -138,6 +150,7 @@ class _myMapState extends State<myMap> {
               body: Stack(children: <Widget>[
                 GoogleMap(
                   mapType: MapType.normal,
+                  mapToolbarEnabled: false,
                   myLocationButtonEnabled: false,
                   myLocationEnabled: false,
                   compassEnabled: true,
@@ -207,9 +220,10 @@ class _myMapState extends State<myMap> {
         return Scaffold(
             body: Stack(children: <Widget>[
               GoogleMap(
+                mapToolbarEnabled: false,
                 mapType: MapType.normal,
                 myLocationButtonEnabled: false,
-                myLocationEnabled: false,
+                myLocationEnabled: true,
                 compassEnabled: true,
                 zoomControlsEnabled: false,
                 onCameraMove: (position) {
@@ -243,6 +257,7 @@ class _myMapState extends State<myMap> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
+                    FloatingActionButton(onPressed: logoutUser,child: const Icon(Icons.logout_outlined)),
                     Switch.adaptive(
                       value: darkModeIsOn,
                       onChanged: (value) {

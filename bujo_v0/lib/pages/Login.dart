@@ -2,6 +2,7 @@
 import 'package:bujo_v0/pages/map.dart';
 import 'package:bujo_v0/pages/register.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bujo_v0/currentUser.dart';
 import 'package:provider/provider.dart';
@@ -10,23 +11,16 @@ class Login extends StatefulWidget {
   const Login({super.key});
   @override
   State<Login> createState() => _LoginState();
-  
-
 }
-
-
-
 
 class _LoginState extends State<Login> {
   final TextEditingController _emailContriller = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   Stream firestore = FirebaseFirestore.instance.collection('users').snapshots();
   void _loginUser(String email, String password, BuildContext context) async {
-    CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
-
+    CurrentUser currentUser = Provider.of<CurrentUser>(context, listen: false);
     try {
-      if (await _currentUser.loginUser(email, password)) {
-        
+      if (await currentUser.loginUser(email, password)) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: ((context) => myMap())));
       } else {
@@ -43,6 +37,15 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    if (FirebaseAuth.instance.currentUser != null) {
+      return MaterialApp(
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          primarySwatch: Colors.blueGrey,
+        ),
+        home: myMap(),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
